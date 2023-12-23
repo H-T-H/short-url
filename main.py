@@ -20,7 +20,9 @@ app = FastAPI()
 
 
 @app.get("/api/push/{path_param:path}")    
-def push_url(request: Request):
+def push_url(request: Request, path_param: str):
+    if not is_valid_url(path_param):
+        raise HTTPException(status_code=400, detail="Invalid URL")
     full_url_str = str(request.url)
     split_url = full_url_str.split(f"{host_}/api/push/")[1]
     split_url = quote(split_url)
@@ -30,7 +32,9 @@ def push_url(request: Request):
     return {"message": f"{host_}/{short_url}"}
 
 @app.get("/api/pop/{path_param:path}")    
-def get_url(request: Request):
+def get_url(request: Request, path_param: str):
+    if not is_valid_url(path_param):
+        raise HTTPException(status_code=400, detail="Invalid URL")
     full_url_str = str(request.url)
     short_url = full_url_str.split(f"{host_}/api/pop/{host_}/")[1]
     link_restoration = r.get(short_url)
@@ -47,7 +51,6 @@ def get_url(request: Request):
     link_restoration = r.get(split_url)
     if link_restoration:
         link_restoration = unquote(link_restoration.decode('utf-8'))
-        print(link_restoration)
         return RedirectResponse(url=link_restoration)
     else:
         return {"message": "None"}
