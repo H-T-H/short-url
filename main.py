@@ -8,7 +8,8 @@ import uvicorn
 
 host_ = 'http://example.com:8000'
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+r = redis.Redis(connection_pool=pool)
 
 def unique_8_letter_hash(input_string):
     md5_hash = hashlib.md5(input_string.encode()).hexdigest()
